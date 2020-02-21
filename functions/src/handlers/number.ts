@@ -44,20 +44,23 @@ module.exports = (functions: any) => {
    * @description Specify the number and language to generate an audio file
    */
   app.post('/number', validate(CreateNumberValidation), async (req, res) => {
-    const { language, number } = req.body;
+    const { language, number, format } = req.body;
+    let formatToUse = format;
+    if (typeof format === 'undefined') {
+      formatToUse = 'mp3';
+    }
 
     //Using NumberBuilder, generate a list of audio files to be compiled
     const audioFiles = unsafeUnwrap(await NumberBuilder.buildNumber(number, language));
 
     //Using FileBuilder, load files and append into a single file
-    const file = unsafeUnwrap(await FileBuilder.createFile(audioFiles, language));
+    const file = unsafeUnwrap(await FileBuilder.createFile(audioFiles, language, formatToUse));
 
     const expiry = 60 * 60; //60 minutes
     const publicUrl = unsafeUnwrap(await uploadPublicFile(file, expiry));
 
     //Set expiry on file, upload to storage
     //get the download url, and format response
-
     res.json({
       expiry: 60 * 60 * 24, //1 day, this is currently managed in the cloud storage lifecycle management
       url: publicUrl,

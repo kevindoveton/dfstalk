@@ -18,18 +18,27 @@ class FileBuilder {
    * 
    * @param audioFiles 
    * @param language 
+   * @param fileExtension
    * 
    * @returns Promise<SomeResult> containing the local url of the file
    */
 
-  public static async createFile(audioFiles: string[], language: string): Promise<SomeResult<string>> {
+  public static async createFile(
+    audioFiles: string[],
+    language: string,
+    fileExtension: string = 'mp3'
+  ): Promise<SomeResult<string>> {
     const audioDir = `${__dirname}/../../src/audio/en_AU_male`;
-    return concatAudioPromise(audioDir, audioFiles);
+    return concatAudioPromise(audioDir, audioFiles, fileExtension);
   }
 }
 
-function concatAudioPromise(basePath: string, audioFiles: string[]): Promise<SomeResult<any>> {
-  const filesWithPath = audioFiles.map(f => `${basePath}/${f}.mp3`);
+function concatAudioPromise(
+  basePath: string,
+  audioFiles: string[],
+  fileExtension: string = 'mp3'
+): Promise<SomeResult<any>> {
+  const filesWithPath = audioFiles.map(f => `${basePath}/${f}.${fileExtension}`);
   const filename = uuidv4();
   const fullFile = `/tmp/${filename}.mp3`;
 
